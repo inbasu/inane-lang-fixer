@@ -12,8 +12,8 @@ import langs.RU as LANG
 
 class Translator:
     def __init__(self, lang=LANG) -> None:
-        keyboard.add_hotkey("ctrl+space", self.work)
-        self.set_langs(LANG)
+        keyboard.add_hotkey("ctrl+shift", self.work)
+        self.set_langs(lang)
         """
         self.native_to_en = lang.EN_TO_NATIVE
         self.eng_to_native = lang.NATIVE_TO_EN
@@ -22,18 +22,28 @@ class Translator:
     def set_langs(self, lang) -> None:
         # try: import lang as lang
         try:
-            self.native_to_en = LANG.EN_TO_NATIVE
-            self.eng_to_native = LANG.NATIVE_TO_EN
+            self.native_to_en = lang.EN_TO_NATIVE
+            self.eng_to_native = lang.NATIVE_TO_EN
         except NameError:
             raise NoDictionary("No dictionary file!")
 
+    def which_lang(self, text: str) -> dict:
+        need_name_for_this_var = a = 0
+        for i in text[::-1]:
+            if abs(a) > 10:
+                break
+            elif i not in self.native_to_en:
+                a += 1
+            elif i not in self.eng_to_native:
+                a -= 1
+        return self.eng_to_native if a > 0 else self.native_to_en
+
     def translate(self, text: str) -> str:
         result = ""
+        curr_dict = self.which_lang(text)
         for ch in text:
-            if ch in self.native_to_en:
-                result += self.native_to_en[ch]
-            elif ch in self.eng_to_native:
-                result += self.eng_to_native[ch]
+            if ch in curr_dict:
+                result += curr_dict[ch]
             else:
                 result += ch
         return result
@@ -50,7 +60,8 @@ class Translator:
 
     def work(self):
         cap_text = self.capture()
-        pyperclip.copy(self.translate(cap_text))
+        if cap_text:
+            pyperclip.copy(self.translate(cap_text))
         self.release_and_clean()
 
 
