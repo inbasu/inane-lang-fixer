@@ -1,6 +1,12 @@
+"""
+If some one review this code:
+is it bad use both word and text as parametrs for string in single class
+PLEASE"""
+
+
 import keyboard
 import pyperclip
-from time import sleep
+from time import sleep  # time.sleep for some delay between 'keyboard' and 'pyperclip
 
 
 """
@@ -15,6 +21,7 @@ class Translator:
         keyboard.add_hotkey("ctrl+`", self.work)
         self.set_lang(lang)
         """
+        ctrl+somekey is necessary becase of 'ctrl+c'/'ctrl+v' conflict
         self.native_to_en = lang.EN_TO_NATIVE
         self.eng_to_native = lang.NATIVE_TO_EN
         """
@@ -26,7 +33,7 @@ class Translator:
         except NameError:
             raise NoDictionary("No dictionary file!")
 
-    def which_lang(self, text: str) -> dict:
+    def dict_for(self, text: str) -> dict:
         native_vs_en = 0
         for i in text:
             if i not in self.native_to_en:
@@ -39,7 +46,7 @@ class Translator:
 
     def translate(self, word: str) -> str:
         result = ""
-        curr_dict = self.which_lang(word)
+        curr_dict = self.dict_for(word)
         for ch in word:
             if ch in curr_dict:
                 result += curr_dict[ch]
@@ -48,6 +55,10 @@ class Translator:
         return result
 
     def split(self, text: str) -> list:
+        """
+        split string to list without .strip()'ing
+        this need for strings like ' word'
+        """
         sweet_roll = [""]
         while text:
             ch, text = text[0], text[1:]
