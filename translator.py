@@ -17,23 +17,28 @@ class Translator:
         except NameError:
             raise NoDictionary("No dictionary file!")
 
-    def dict_for(self, text: str) -> dict:
+    def dicts_for(self, text: str) -> dict:
         native_vs_en = 0
         for i in text:
             if i not in self.native_to_en:
                 native_vs_en += 1
             elif i not in self.eng_to_native:
                 native_vs_en -= 1
-        if not native_vs_en:
-            return dict()
-        return self.eng_to_native if native_vs_en > 0 else self.native_to_en
+        return (
+            self.eng_to_native if native_vs_en >= 0 else self.native_to_en,
+            self.native_to_en if native_vs_en >= 0 else self.eng_to_native,
+        )
 
     def translate(self, word: str) -> str:
+        if not word:
+            return word
         result = ""
-        curr_dict = self.dict_for(word)
+        curr_dict, reverse_dict = self.dicts_for(word)
         for ch in word:
             if ch in curr_dict:
                 result += curr_dict[ch]
+            elif ch in reverse_dict:
+                result += reverse_dict[ch]
             else:
                 result += ch
         return result
